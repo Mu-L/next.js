@@ -74,6 +74,7 @@ if (!allowedActions.has(actionInfo.actionName) && !actionInfo.isRelease) {
         logger('Release detected, resetting mainRepo to last stable tag')
         const lastStableTag = await getLastStable(mainRepoDir, actionInfo.prRef)
         if (!lastStableTag) throw new Error('failed to get last stable tag')
+        console.log('using latestStable', lastStableTag)
         await checkoutRef(lastStableTag, mainRepoDir)
 
         /* eslint-disable-next-line */
@@ -101,7 +102,9 @@ if (!allowedActions.has(actionInfo.actionName) && !actionInfo.isRelease) {
       logger(`Running initial build for ${dir}`)
       if (!actionInfo.skipClone) {
         let buildCommand = `cd ${dir}${
-          !statsConfig.skipInitialInstall ? ' && yarn install' : ''
+          !statsConfig.skipInitialInstall
+            ? ' && yarn install --network-timeout 1000000'
+            : ''
         }`
 
         if (statsConfig.initialBuildCommand) {
